@@ -14,6 +14,11 @@ class Item(BaseModel):
 
 @app.get("/")
 def read_root():
+    return "Hello World"
+
+
+@app.get("/testapi")
+def return_api():
     return {"Hello": "World"}
 
 
