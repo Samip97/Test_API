@@ -4,3 +4,6 @@ __pycache__/
 __pycache__/*
 id_samip97
 id_samip97.pub
+*.ipynb
+*.jpg
+*.png
