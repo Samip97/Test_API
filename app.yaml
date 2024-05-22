@@ -1,0 +1,11 @@
+runtime: python39
+
+# Set App Engine instance class (defaults to F1)
+# See https://cloud.google.com/appengine/docs/standard/#instance_classes
+instance_class: F4
+
+# Set entrypoint to locate FastAPI app, which is 'application' in module app/main.py
+# Configure gunicorn worker count via --workers arg based on the App Engine instance class
+#   e.g. Set workers = 1 for F1 instance class, workers = 2 for F2, and workers = 4 for F4
+# See https://cloud.google.com/appengine/docs/standard/python3/runtime#application_startup
+entrypoint: uvicorn main:app --host 0.0.0.0 --port 8080
