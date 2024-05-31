@@ -116,15 +116,21 @@ async def home(authorized: bool = Depends(verify_token)):
 def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token)):
     if authorized == False:
         return {"success": False, "message": "token has expired"}
-    try:
-        contents = file.file.read()
-        with open(file.filename, 'wb') as f:
-            f.write(contents)
-    except Exception:
-        return {"message": "There was an error uploading the file"}
-    finally:
-        file.file.close()
 
+    # print(file, file, )
+    # try:
+    #     contents = file.file.read()
+    #     with open(file.filename, 'wb') as f:
+    #         f.write(contents)
+    # except Exception:
+    #     return {"message": "There was an error uploading the file"}
+    # finally:
+    #     file.file.close()
+
+    contents = file.file.read()
+    with open(file.filename, 'wb') as f:
+        f.write(contents)
+    file.file.close()
     return {"message": f"Successfully uploaded {file.filename}"}
 
         
