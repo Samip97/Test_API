@@ -111,7 +111,7 @@ def upload_to_storage(filename, bucketname):
     storage_client = storage.Client(credentials=credentials)
     bucket = storage_client.bucket(bucketname)
     blob = bucket.blob(filename)
-    blob.upload_from_filename(filename)
+    blob.upload_from_filename("/tmp/"+filename)
 
 def download_from_storage(filename, bucketname):
     credentials = service_account.Credentials.from_service_account_file("secret-node-424009-k6-4dc19cc48467.json")
@@ -148,7 +148,7 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
         f.write(contents)
     file.file.close()
 
-    upload_to_storage("/tmp/"+file.filename, "raw_images_rdd")
+    upload_to_storage(file.filename, "raw_images_rdd")
     
     os.remove("/tmp/"+file.filename)
     return {"message": f"Successfully uploaded {file.filename}"}
