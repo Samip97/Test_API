@@ -147,6 +147,8 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
     with open("/tmp/"+file.filename, 'wb') as f:
         f.write(contents)
     file.file.close()
+
+    upload_to_storage("/tmp/"+file.filename, "raw_images_rdd")
     
     os.remove("/tmp/"+file.filename)
     return {"message": f"Successfully uploaded {file.filename}"}
