@@ -7,3 +7,6 @@ id_samip97.pub
 *.ipynb
 *.jpg
 *.png
+
+deployments_env.yml
+secret-node-424009-k6-4dc19cc48467.json
