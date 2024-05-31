@@ -13,8 +13,9 @@ from ultralytics import YOLO
 import cv2
 
 from google.oauth2 import service_account
-from google.cloud import datastore
+from google.cloud import datastore, storage
 from datetime import datetime, timedelta, timezone
+import os
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -104,6 +105,21 @@ def verify_token(req: Request):
     except jwt.ExpiredSignatureError:
         print("has expired")
         return False
+
+def upload_to_storage(filename, bucketname):
+    credentials = service_account.Credentials.from_service_account_file("secret-node-424009-k6-4dc19cc48467.json")
+    storage_client = storage.Client(credentials=credentials)
+    bucket = storage_client.bucket(bucketname)
+    blob = bucket.blob(filename)
+    blob.upload_from_filename(filename)
+
+def download_from_storage(filename, bucketname):
+    credentials = service_account.Credentials.from_service_account_file("secret-node-424009-k6-4dc19cc48467.json")
+    storage_client = storage.Client(credentials=credentials)
+    bucket = storage_client.bucket(bucketname)
+    blob = bucket.blob(filename)
+    blob.download_to_filename("/tmp/"+filename)
+    
         
 @app.get("/test")
 async def home(authorized: bool = Depends(verify_token)):
@@ -131,16 +147,28 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
     with open("/tmp/"+file.filename, 'wb') as f:
         f.write(contents)
     file.file.close()
+    
+    os.remove("/tmp/"+file.filename)
     return {"message": f"Successfully uploaded {file.filename}"}
 
         
 
 @app.post("/inference")
 def upload(file: ImageName):
+    download_from_storage(file.filename, "raw_images_rdd")
 
-    print(file.filename)
+    model = YOLO("model/yolov8n.pt")
+    results = model("/tmp/"+file.filename)  
 
+    output_filename = file.filename.split(".")[0]
+    cv2.imwrite(f"/tmp/{output_filename}_output.jpg", results[0].plot())
+
+    upload_to_storage(f"{output_filename}_output.jpg", "predicted_images_rdd")
     
+    print(output_filename, "*"*25)
+
+    os.remove("/tmp/"+file.filename)
+    return {"success":True, "filename": output_filename}
 
 
 
