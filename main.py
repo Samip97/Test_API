@@ -128,7 +128,7 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
     #     file.file.close()
 
     contents = file.file.read()
-    with open(file.filename, 'wb') as f:
+    with open("/tmp/"+file.filename, 'wb') as f:
         f.write(contents)
     file.file.close()
     return {"message": f"Successfully uploaded {file.filename}"}
