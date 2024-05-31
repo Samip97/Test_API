@@ -133,16 +133,6 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
     if authorized == False:
         return {"success": False, "message": "token has expired"}
 
-    # print(file, file, )
-    # try:
-    #     contents = file.file.read()
-    #     with open(file.filename, 'wb') as f:
-    #         f.write(contents)
-    # except Exception:
-    #     return {"message": "There was an error uploading the file"}
-    # finally:
-    #     file.file.close()
-
     contents = file.file.read()
     with open("/tmp/"+file.filename, 'wb') as f:
         f.write(contents)
@@ -151,7 +141,9 @@ def upload(file: UploadFile = File(...), authorized: bool = Depends(verify_token
     upload_to_storage(file.filename, "raw_images_rdd")
     
     os.remove("/tmp/"+file.filename)
-    return {"message": f"Successfully uploaded {file.filename}"}
+
+    output_filename = file.filename.split(".")[0]
+    return {"success":True, "url": f"https://storage.cloud.google.com/predicted_images_rdd/{output_filename}_output.jpg"}
 
         
 
@@ -173,29 +165,6 @@ def upload(file: ImageName):
     return {"success":True, "filename": output_filename}
 
 
-
-# @app.post("/inference")
-# def inference(img: ImgData, current_user:Annotated[User, Depends(get_current_active_user)]):
-
-#     base64_received = str.encode(img.image_data)
-#     image_64_decode = base64.b64decode(base64_received)
-#     image_result = open('/tmp/testk.jpg', 'wb') # create a writable image and write the decoding result
-#     image_result.write(image_64_decode)
-
-#     model = YOLO("model/yolov8n.pt")
-
-
-#     results = model("/tmp/testk.jpg")  
-
-#     cv2.imwrite("/tmp/pr.jpg", results[0].plot())
-
-
-#     image = open('/tmp/pr.jpg', 'rb') #open binary file in read mode
-#     image_read = image.read()
-#     image_64_encode = base64.b64encode(image_read)
-#     return_byte = image_64_encode.decode()
-    
-#     return {"success":True, "annotated_image_bytestring": return_byte}
 
     
 
